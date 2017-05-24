@@ -11,6 +11,8 @@ import UIKit
 public protocol PDFViewControllerDelegate: class {
   /// The last page of the document was displayed
   func didDisplayLastPage()
+  /// The page was changed
+  func didDisplayPage(_ pageIndex: Int)
 }
 
 extension PDFViewController {
@@ -256,6 +258,7 @@ public final class PDFViewController: UIViewController {
             currentPageIndex += 1
             collectionView.scrollToItem(at: IndexPath(row: currentPageIndex, section: 0), at: .left, animated: false)
             thumbnailCollectionController?.currentPageIndex = currentPageIndex
+            delegate?.didDisplayPage(currentPageIndex)
         }
     }
   
@@ -265,6 +268,7 @@ public final class PDFViewController: UIViewController {
             currentPageIndex -= 1
             collectionView.scrollToItem(at: IndexPath(row: currentPageIndex, section: 0), at: .left, animated: false)
             thumbnailCollectionController?.currentPageIndex = currentPageIndex
+            delegate?.didDisplayPage(currentPageIndex)
         }
     }
   
@@ -275,6 +279,7 @@ public final class PDFViewController: UIViewController {
             currentPageIndex = number
             collectionView.scrollToItem(at: IndexPath(row: currentPageIndex, section: 0), at: .left, animated: false)
             thumbnailCollectionController?.currentPageIndex = currentPageIndex
+            delegate?.didDisplayPage(currentPageIndex)
         }
     }
   
@@ -303,6 +308,7 @@ extension PDFViewController: PDFThumbnailControllerDelegate {
     func didSelectIndexPath(_ indexPath: IndexPath) {
         collectionView.scrollToItem(at: indexPath, at: .left, animated: false)
         thumbnailCollectionController?.currentPageIndex = currentPageIndex
+        delegate?.didDisplayPage(currentPageIndex)
     }
 }
 
@@ -358,6 +364,7 @@ extension PDFViewController: UIScrollViewDelegate {
         if updatedPageIndex != currentPageIndex {
             currentPageIndex = updatedPageIndex
             thumbnailCollectionController?.currentPageIndex = currentPageIndex
+            delegate?.didDisplayPage(currentPageIndex)
         }
     }
 }
