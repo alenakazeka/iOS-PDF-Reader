@@ -101,7 +101,12 @@ public final class PDFViewController: UIViewController {
         }
       }
     }
-    
+  
+    /// Get number of page being displayed
+    public var currentPageNumber: Int {
+        return currentPageIndex
+    }
+  
     /// Bottom thumbnail controller
     fileprivate var thumbnailCollectionController: PDFThumbnailCollectionViewController?
     
@@ -119,10 +124,10 @@ public final class PDFViewController: UIViewController {
     }
   
     /// Background color to apply to the thumbnails.
-  public var thumbnailsBackgroundColor: UIColor? = .clear {
-      didSet {
-        thumbnailContainerView?.backgroundColor = thumbnailsBackgroundColor
-      }
+    public var thumbnailsBackgroundColor: UIColor? = .clear {
+        didSet {
+            thumbnailContainerView?.backgroundColor = thumbnailsBackgroundColor
+        }
     }
   
     /// Whether or not the thumbnails bar should be enabled
@@ -243,6 +248,54 @@ public final class PDFViewController: UIViewController {
         printInteraction.printingItem = document.fileData
         printInteraction.showsPageRange = true
         printInteraction.present(animated: true, completionHandler: nil)
+    }
+  
+    /// Presents next page of document
+    public func nextPage() {
+        if currentPageIndex != document.pageCount - 1 {
+            currentPageIndex += 1
+            collectionView.scrollToItem(at: IndexPath(row: currentPageIndex, section: 0), at: .left, animated: false)
+            thumbnailCollectionController?.currentPageIndex = currentPageIndex
+        }
+    }
+  
+    /// Presents previous page of document
+    public func previousPage() {
+        if currentPageIndex != 0 {
+            currentPageIndex -= 1
+            collectionView.scrollToItem(at: IndexPath(row: currentPageIndex, section: 0), at: .left, animated: false)
+            thumbnailCollectionController?.currentPageIndex = currentPageIndex
+        }
+    }
+  
+    /// Presents specific page
+    /// - parameter by number: number of the page you want to present
+    public func presentPage(by number: Int) {
+        if number < document.pageCount && number > 0 {
+            currentPageIndex = number
+            collectionView.scrollToItem(at: IndexPath(row: currentPageIndex, section: 0), at: .left, animated: false)
+            thumbnailCollectionController?.currentPageIndex = currentPageIndex
+        }
+    }
+  
+    /// Zoom in current page
+    public func zoomIn() {
+      if let currentPageCell = collectionView.cellForItem(at: IndexPath(row: currentPageIndex, section: 0)) as? PDFPageCollectionViewCell {
+        let scale = currentPageCell.pageView!.zoomScale + (currentPageCell.pageView!.maximumZoomScale - currentPageCell.pageView!.minimumZoomScale) / 10
+        if scale <= currentPageCell.pageView!.maximumZoomScale {
+          currentPageCell.pageView!.setZoomScale(scale, animated: true)
+        }        
+      }
+    }
+  
+    /// Zoom out current page
+    public func zoomOut() {
+        if let currentPageCell = collectionView.cellForItem(at: IndexPath(row: currentPageIndex, section: 0)) as? PDFPageCollectionViewCell {
+            let scale = currentPageCell.pageView!.zoomScale - (currentPageCell.pageView!.maximumZoomScale - currentPageCell.pageView!.minimumZoomScale) / 10
+            if scale >= currentPageCell.pageView!.minimumZoomScale {
+                currentPageCell.pageView!.setZoomScale(scale, animated: true)
+            }
+        }
     }
 }
 
