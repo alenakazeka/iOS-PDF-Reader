@@ -42,7 +42,7 @@ internal final class PDFThumbnailCollectionViewController: UICollectionViewContr
             collectionView?.reloadData()
         }
     }
-    
+  
     override func viewDidLoad() {
         super.viewDidLoad()
         DispatchQueue.global(qos: .background).async {

@@ -7,6 +7,12 @@
 
 import UIKit
 
+/// Delegate that is informed of important events
+public protocol PDFViewControllerDelegate: class {
+  /// The last page of the document was displayed
+  func didDisplayLastPage()
+}
+
 extension PDFViewController {
     /// Initializes a new `PDFViewController`
     ///
@@ -66,7 +72,10 @@ public final class PDFViewController: UIViewController {
     
     /// Collection veiw where all the pdf pages are rendered
     @IBOutlet public var collectionView: UICollectionView!
-    
+  
+    /// Container view for thumbnailCollectionController
+    @IBOutlet weak var thumbnailContainerView: UIView!
+  
     /// Height of the thumbnail bar (used to hide/show)
     @IBOutlet fileprivate var thumbnailCollectionControllerHeight: NSLayoutConstraint!
     
@@ -85,7 +94,13 @@ public final class PDFViewController: UIViewController {
     fileprivate var actionButtonImage: UIImage?
     
     /// Current page being displayed
-    fileprivate var currentPageIndex: Int = 0
+    fileprivate var currentPageIndex: Int = 0 {
+      didSet {
+        if currentPageIndex == (document?.pageCount ?? 0) - 1 {
+          delegate?.didDisplayLastPage()
+        }
+      }
+    }
     
     /// Bottom thumbnail controller
     fileprivate var thumbnailCollectionController: PDFThumbnailCollectionViewController?
@@ -102,7 +117,14 @@ public final class PDFViewController: UIViewController {
             collectionView?.backgroundColor = backgroundColor
         }
     }
-    
+  
+    /// Background color to apply to the thumbnails.
+  public var thumbnailsBackgroundColor: UIColor? = .clear {
+      didSet {
+        thumbnailContainerView?.backgroundColor = thumbnailsBackgroundColor
+      }
+    }
+  
     /// Whether or not the thumbnails bar should be enabled
     fileprivate var isThumbnailsEnabled = true {
         didSet {
@@ -126,7 +148,10 @@ public final class PDFViewController: UIViewController {
             }
         }
     }
-    
+  
+    /// Delegate
+    public var delegate: PDFViewControllerDelegate?
+  
     override public func viewDidLoad() {
         super.viewDidLoad()
     
