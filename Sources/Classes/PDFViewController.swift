@@ -254,7 +254,7 @@ public final class PDFViewController: UIViewController {
   
     /// Presents next page of document
     public func nextPage() {
-        if currentPageIndex != document.pageCount - 1 {
+        if currentPageIndex < document.pageCount - 1 {
             currentPageIndex += 1
             collectionView.scrollToItem(at: IndexPath(row: currentPageIndex, section: 0), at: .left, animated: false)
             thumbnailCollectionController?.currentPageIndex = currentPageIndex
@@ -264,7 +264,7 @@ public final class PDFViewController: UIViewController {
   
     /// Presents previous page of document
     public func previousPage() {
-        if currentPageIndex != 0 {
+        if currentPageIndex > 0 {
             currentPageIndex -= 1
             collectionView.scrollToItem(at: IndexPath(row: currentPageIndex, section: 0), at: .left, animated: false)
             thumbnailCollectionController?.currentPageIndex = currentPageIndex
