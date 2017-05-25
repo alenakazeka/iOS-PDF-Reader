@@ -209,13 +209,14 @@ public final class PDFViewController: UIViewController {
             let currentIndexPath = IndexPath(row: self.currentPageIndex, section: 0)
             self.collectionView.reloadItems(at: [currentIndexPath])
             self.collectionView.scrollToItem(at: currentIndexPath, at: .centeredHorizontally, animated: false)
+            self.collectionView.isScrollEnabled = true
             }) { context in
                 self.thumbnailCollectionController?.currentPageIndex = self.currentPageIndex
         }
-        
+        self.collectionView.isScrollEnabled = false
         super.viewWillTransition(to: size, with: coordinator)
     }
-    
+  
     /// Takes an appropriate action based on the current action style
     func actionButtonPressed() {
         switch actionStyle {
@@ -354,6 +355,9 @@ extension PDFViewController: UICollectionViewDelegateFlowLayout {
 
 extension PDFViewController: UIScrollViewDelegate {
     public func scrollViewDidScroll(_ scrollView: UIScrollView) {
+        if !self.collectionView.isScrollEnabled  {
+            return
+        }
         let updatedPageIndex: Int
         if self.scrollDirection == .vertical {
             updatedPageIndex = Int(round(max(scrollView.contentOffset.y, 0) / scrollView.bounds.height))
@@ -361,7 +365,7 @@ extension PDFViewController: UIScrollViewDelegate {
             updatedPageIndex = Int(round(max(scrollView.contentOffset.x, 0) / scrollView.bounds.width))
         }
         
-        if updatedPageIndex != currentPageIndex {
+        if updatedPageIndex != currentPageIndex && updatedPageIndex < document.pageCount && updatedPageIndex > 0 {
             currentPageIndex = updatedPageIndex
             thumbnailCollectionController?.currentPageIndex = currentPageIndex
             delegate?.didDisplayPage(currentPageIndex)
